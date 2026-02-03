@@ -3,8 +3,8 @@
   * @file     my_heap.h
   * @author   Kukushkin A.V.
   * @brief    Header file for heap wrapper
-  * @version  V1.0.1
-  * @date     24. Feb. 2025
+  * @version  V1.0.2
+  * @date     03. Feb. 2026
   ******************************************************************************
   */ 
 
@@ -48,7 +48,9 @@ extern "C"{
      * @return true   static heap init complete  
      * @return false  static heap init fault
      */
+    #include "StaticHeap/sheap.h"
     #define heap_init(heap,size) SHeap_init(heap,size)
+    
   #else 
     #ifdef USE_FREERTOS_MEMORY 
     #include "FreeRTOS.h"
