@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file     my_heap.h
-  * @author   Kukushkin A.V.
+  * @file     wheap.h
+  * @author   Wyrm
   * @brief    Header file for heap wrapper
-  * @version  V1.0.2
+  * @version  V1.0.3
   * @date     03. Feb. 2026
   ******************************************************************************
   */ 
@@ -17,7 +17,6 @@
 extern "C"{
 #endif
 
-#include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -33,7 +32,6 @@ extern "C"{
  */
 
 /* Public macro -------------------------------------------------------------*/
-
 
 /**
  * @defgroup my_heap_wrapper My heap wrapper macro
@@ -112,6 +110,8 @@ extern "C"{
       #endif
     #endif
   #endif   
+
+  
     
   #ifdef USE_STD_MALLOC
   /**
@@ -134,7 +134,7 @@ extern "C"{
     #define heap_free(ptr) free(ptr)
   #else 
     #ifdef USE_MY_STATIC_MEMORY
-      #define heap_free(ptr) SHeap_free(ptr)
+        #define heap_free(ptr) SHeap_free(ptr)
     #else 
       #ifdef USE_FREERTOS_MEMORY
         #define heap_free(ptr) vPortFree(ptr)
