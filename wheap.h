@@ -3,14 +3,14 @@
   * @file     wheap.h
   * @author   Wyrm
   * @brief    Header file for heap wrapper
-  * @version  V1.0.3
-  * @date     03. Feb. 2026
+  * @version  V1.0.4
+  * @date     07. Oct. 2026
   ******************************************************************************
   */ 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MY_MEMORY_H__
-#define __MY_MEMORY_H__
+#ifndef __W_HEAP_H__
+#define __W_HEAP_H__
 
 
 #ifdef __cplusplus
@@ -70,9 +70,15 @@ extern "C"{
     #else 
       #ifdef USE_FREERTOS_MEMORY
         #define heap_malloc(size) pvPortMalloc(size)
-      #endif
-    #endif
-  #endif      
+      #else
+        #if defined(WHEAP_USE_CPP_NEW) && defined(__cplusplus)
+          #define heap_malloc(size) ::operator new(size)
+          #define heap_free(ptr)    ::operator delete(ptr)
+        #endif/* WHEAP_USE_CPP_NEW    */
+      #endif /* USE_FREERTOS_MEMORY  */
+    #endif  /* USE_MY_STATIC_MEMORY */
+  #endif   /* USE_STD_MALLOC       */
+
   /**
    * @brief Allocates size bytes of uninitialized storage and Explicit Conversion . (malloc wrapper)
    * @param type what type to convert to
@@ -149,5 +155,47 @@ extern "C"{
 }
 #endif
 
-#endif
+#ifdef __cplusplus
+
+#include <new>
+#include <utility>
+#include <type_traits>
+
+
+
+namespace heap {
+    /**
+     * @brief create Operator new wrapper for create class
+     * @param args what pass to class
+     * @return pointer to allocated class
+     */
+    template <typename T, typename... Args>
+    T* create(Args&&... args)
+    {
+      void* raw_mem = heap_malloc(sizeof(T));
+
+      if (!raw_mem)
+        return nullptr;
+
+      return ::new (raw_mem) T(std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief destroy wrapper for operator delete for destroy class
+     * @param ptr pointer to class
+     */
+    template <typename T>
+    void destroy(T* ptr)
+    {
+      if(!ptr)
+        return;
+
+      if constexpr (std::is_class_v<T>)
+          ptr->~T();
+
+       heap_free(ptr);
+    }
+}
+#endif  /*  #ifdef __cplusplus for heap namespace */
+#endif  /*  #ifndef __MY_MEMORY_H__               */
 
